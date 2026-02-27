@@ -1,327 +1,165 @@
-# README - SSH Authentication Module
+# 🔐 SSH Authentication Module
 
-[![Maven CI](https://github.com/ManasviWaghmare/ssh_auth/actions/workflows/maven.yml/badge.svg)](https://github.com/ManasviWaghmare/ssh_auth/actions/workflows/maven.yml)
+[![Java Version](https://img.shields.io/badge/Java-17-blue.svg)](https://www.oracle.com/java/technologies/javase/jdk17-archive-downloads.html)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Database](https://img.shields.io/badge/Database-SQLite-lightgrey.svg)](https://www.sqlite.org/index.html)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Project Overview
 
-The **SSH Authentication Module** is a comprehensive Spring Boot-based REST API that provides secure SSH connection management, remote command execution, and SSH key management capabilities. It integrates with various backend systems for attendance, certificates, and dashboard operations.
+## 📖 Overview
 
-## Features
+The **SSH Authentication Module** is a enterprise-grade Spring Boot application designed to centralize and secure SSH access to remote infrastructure. It provides a robust API for SSH key lifecycle management and audited remote command execution, abstracting the complexities of the SSH protocol into simple RESTful endpoints.
 
-✅ **SSH Connection Management**
-- Test SSH connections with remote servers
-- Manage SSH sessions and timeouts
-- Support for multiple SSH key formats
+---
 
-✅ **Remote Command Execution**
-- Execute commands on remote servers via SSH
-- Capture command output and exit codes
-- Configurable execution timeouts
+## 🚀 Key Features
 
-✅ **SSH Key Management**
-- Upload and store SSH key pairs
-- Encrypt private keys using AES-256
-- Generate key fingerprints
-- Validate key format and integrity
-- Delete keys with proper cleanup
+-   **SSH Key Lifecycle Management**: Securely upload, store, and validate RSA/ED25519 key pairs.
+-   **Audited Command Execution**: Execute commands on remote linux servers with full output capturing and timeout management.
+-   **AES-256 Encryption**: All sensitive data, including private keys, are encrypted at rest.
+-   **Comprehensive Audit Trail**: Every connection and command execution is logged for security compliance.
+-   **Interactive Documentation**: Fully integrated Swagger UI for API exploration.
+-   **Lightweight Persistence**: Powered by SQLite for zero-config database setup.
+-   **Docker Ready**: Multi-container support for seamless deployment.
 
-✅ **Security Features**
-- Encrypted private key storage
-- Spring Security integration
-- CORS configuration
-- Global exception handling
-- Audit logging of all operations
+---
 
-✅ **Integration Services**
-- Attendance system integration
-- Certificate management integration
-- Dashboard monitoring integration
+## 🏗 System Architecture
 
-✅ **Database Support**
-- SQLite integration via Spring Data JPA (file-based)
-- Audit log storage
-- SSH key pair persistence
+The following diagram illustrates the high-level architecture and data flow of the system:
 
-## Technology Stack
+```mermaid
+graph TD
+    subgraph Client_Layer [Client Applications]
+        Browser[Web Browser]
+        CLI[Terminal/CLI]
+    end
 
-| Technology | Version | Purpose |
-|-----------|---------|---------|
-| Java | 17 | Programming Language |
-| Spring Boot | 3.2.0 | Framework |
-| Spring Security | 5.x | Authentication/Authorization |
-| Spring Data JPA | - | Database ORM |
-| SQLite | 3.x (file) | Database |
-| JSch | 0.1.55 | SSH Library |
-| Lombok | - | Boilerplate Reduction |
-| JWT | 0.12.3 | Token Authentication |
-| Maven | 3.x | Build Tool |
-| Docker | - | Containerization |
+    subgraph API_Layer [API Layer - Spring Boot]
+        Controller[REST Controllers]
+        Security[Spring Security & JWT]
+        Handlers[Global Exception Handlers]
+    end
 
-## Project Structure
+    subgraph Core_Module [Core Authentication Module]
+        ConnManager[SSH Connection Manager]
+        KeyService[Key Authentication Service]
+        CmdExecutor[Command Executor]
+        Encryption[AES Encryption Util]
+        Audit[Audit Logger]
+    end
 
-```
-ssh-authentication-module/
-├── api-layer/                           # API Layer (Spring Boot)
-│   └── src/main/java/com/org/sshauth/api/
-│       ├── controller/
-│       │   ├── SSHRestController.java
-│       │   └── KeyManagementController.java
-│       ├── dto/
-│       │   ├── SSHConnectRequest.java
-│       │   ├── CommandRequest.java
-│       │   ├── KeyUploadRequest.java
-│       │   └── SSHResponse.java
-│       ├── config/
-│       │   └── SecurityConfig.java
-│       └── SshAuthApplication.java
-│
-├── ssh-authentication-module/           # Core Module
-│   └── src/main/java/com/org/sshauth/core/
-│       ├── ssh-core-library/
-│       │   ├── SSHConnectionManager.java
-│       │   ├── KeyAuthenticationService.java
-│       │   └── CommandExecutor.java
-│       ├── integration-services/
-│       │   ├── AttendanceIntegrationService.java
-│       │   ├── CertificateIntegrationService.java
-│       │   └── DashboardIntegrationService.java
-│       ├── utilities-security/
-│       │   ├── EncryptionUtil.java
-│       │   ├── AuditLogger.java
-│       │   ├── ExceptionHandlerUtil.java
-│       │   └── FileUtil.java
-│       ├── model/
-│       │   ├── SSHRequest.java
-│       │   ├── SSHKeyPair.java
-│       │   └── AuditLog.java
-│       └── exception/
-│           ├── SSHAuthenticationException.java
-│           ├── SSHConnectionException.java
-│           └── KeyValidationException.java
-│
-├── resources/
-│   ├── application.properties           # Spring Configuration
-│   ├── logback.xml                      # Logging Configuration
-│   └── keys/                            # SSH Keys Storage
-│
-├── docker/
-│   ├── Dockerfile                       # Docker Image
-│   └── docker-compose.yml               # Docker Compose Setup
-│
-├── docs/
-│   ├── api-documentation.md             # API Documentation
-│   ├── architecture-diagram.md          # Architecture Diagrams
-│   └── sequence-diagram.md              # Sequence Diagrams
-│
-└── pom.xml                              # Maven Configuration
+    subgraph Data_Layer [Data Layer]
+        SQLite[(SQLite DB)]
+        Repositories[JPA Repositories]
+    end
+
+    subgraph Infrastructure [Remote Infrastructure]
+        ServerA[Production Server]
+        ServerB[Database Server]
+    end
+
+    Browser & CLI --> Controller
+    Controller --> Security
+    Security --> KeyService & ConnManager
+    KeyService & ConnManager --> Encryption
+    KeyService & ConnManager --> Repositories
+    Repositories --> SQLite
+    ConnManager --> CmdExecutor
+    CmdExecutor --> Infrastructure
+    CmdExecutor --> Audit
+    Audit --> Repositories
 ```
 
-## Installation & Setup
+---
+
+## 🛡 Security & Compliance
+
+Security is at the heart of the SSH Authentication Module:
+
+1.  **Encryption at Rest**: Private keys are never stored in plain text. They are encrypted using the **AES-256** algorithm before being persisted to the database.
+2.  **Audit Logging**: Every sensitive operation (key upload, connection test, command execution) generates an audit log entry containing the timestamp, user ID, requested host, and execution status.
+3.  **Authentication**: API endpoints are secured via Spring Security, supporting JWT-based tokenization for stateless, secure communication.
+4.  **Parameter Validation**: Strict validation on all incoming DTOs ensures that hostnames, ports, and commands conform to expected patterns, preventing injection attacks.
+
+---
+
+## 🏁 Getting Started
 
 ### Prerequisites
-- Java 17 or higher
-- Maven 3.6+
-- SQLite 3.x (bundled with JDBC)
-- Docker & Docker Compose (optional)
 
-### Local Development Setup
+-   **Java 17 JDK**
+-   **Maven 3.6+**
+-   **Docker & Docker Compose** (Optional for containerized setup)
 
-1. **Clone the repository**
-```bash
-git clone <repository-url>
-cd ssh-authentication-module
-```
+### Local Setup
 
-2. **Prepare SQLite Database**
+1.  **Clone & Prepare**:
+    ```bash
+    git clone <repository-url>
+    cd ssh_auth/ssh_auth
+    mkdir -p data logs
+    ```
 
-No external database server is required. The application will create a local SQLite file automatically. To pre-create the directory run:
-```bash
-mkdir -p data
-# (optional) initialize using sqlite3 CLI:
-# sqlite3 data/ssh_auth.db "PRAGMA journal_mode=WAL;"
-```
+2.  **Build**:
+    ```bash
+    mvn clean install
+    ```
 
-3. **Build the project**
-```bash
-mvn clean install
-```
+3.  **Run**:
+    ```bash
+    mvn spring-boot:run
+    ```
+    Access the application at `http://localhost:8080`.
 
-4. **Run the application**
-```bash
-mvn spring-boot:run
-```
+### Docker Deployment
 
-5. **Access the application**
-- API: http://localhost:8080
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- API Docs: http://localhost:8080/v3/api-docs
+Deploy the entire stack (API + Dashboard) using Docker Compose:
 
-### Docker Setup
-
-1. **Build and run with Docker Compose**
 ```bash
 docker-compose up -d
 ```
 
-2. **Verify services**
-```bash
-docker-compose ps
-```
+---
 
-3. **View logs**
-```bash
-docker-compose logs -f ssh-auth-api
-```
+## 📖 API Reference
 
-4. **Access services**
-- API: http://localhost:8080
-- Swagger UI: http://localhost:8080/swagger-ui.html
-- PHPMyAdmin: http://localhost:8081
+### Key Management (`/api/v1/keys`)
 
-5. **Stop services**
-```bash
-docker-compose down
-```
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/upload` | Upload and encrypt a new SSH key pair |
+| `GET` | `/all` | Retrieve a summary of all stored keys |
+| `GET` | `/{id}` | Get details for a specific key |
+| `DELETE` | `/{id}` | Securely remove a key pair from the system |
+| `POST` | `/{id}/validate` | Verify the integrity of a stored key |
 
-## API Usage
+### SSH Operations (`/api/v1/ssh`)
 
-### Example 1: Test SSH Connection
-```bash
-curl -X POST http://localhost:8080/api/v1/ssh/connect \
-  -H "Content-Type: application/json" \
-  -d '{
-    "host": "192.168.1.100",
-    "port": 22,
-    "username": "admin",
-    "keyPairId": "my-key-id"
-  }'
-```
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/connect` | Test connection to a remote host using a stored key |
+| `POST` | `/execute` | Execute a command and capture STDOUT/STDERR |
+| `GET` | `/status/{host}` | Retrieve current session status for a host |
 
-### Example 2: Execute Command
-```bash
-curl -X POST http://localhost:8080/api/v1/ssh/execute \
-  -H "Content-Type: application/json" \
-  -d '{
-    "host": "192.168.1.100",
-    "username": "admin",
-    "command": "ls -la /home",
-    "keyPairId": "my-key-id"
-  }'
-```
-
-### Example 3: Upload SSH Key
-```bash
-curl -X POST http://localhost:8080/api/v1/keys/upload \
-  -H "Content-Type: application/json" \
-  -d '{
-    "keyName": "my-production-key",
-    "publicKey": "ssh-rsa AAAAB3NzaC1yc2E...",
-    "privateKey": "-----BEGIN RSA PRIVATE KEY-----\n...\n-----END RSA PRIVATE KEY-----",
-    "keyAlgorithm": "RSA",
-    "keySize": 2048,
-    "description": "Production server key"
-  }'
-```
-
-## Configuration
-
-### application.properties
-
-## Frontend
-
-A minimal static UI is provided under `frontend/`. It communicates with the backend API on `http://localhost:8080`.
-
-### Running the frontend
-
-1. Build & start the backend as described earlier (`mvn spring-boot:run`).
-2. Serve the `frontend` directory with a simple HTTP server, for example:
-   ```bash
-   cd frontend
-   python3 -m http.server 3000
-   ```
-3. Open http://localhost:3000 in your browser. The page contains forms for testing SSH connection, executing commands and uploading keys.
-
-Key configurations:
-```yaml
-spring:
-  datasource:
-    url: jdbc:sqlite:./data/ssh_auth.db
-    driver-class-name: org.sqlite.JDBC
-    # SQLite does not require username/password
-  jpa:
-    hibernate:
-      ddl-auto: update
-
-server:
-  port: 8080
-```
-
-### logback.xml
-Logging configuration:
-- Console and file appenders
-- Rolling file policy (10MB per file, 30 days retention)
-- Custom log levels per package
-
-## Security Considerations
-
-1. **Encryption**: Private keys are encrypted using AES-256 before storage
-2. **Key Storage**: Keys should be stored in a secure vault in production
-3. **Authentication**: Implement JWT/OAuth2 for API authentication
-4. **HTTPS**: Use HTTPS in production environments
-5. **Audit Logging**: All operations are logged for compliance
-
-## Monitoring & Logging
-
-- **Log Location**: `logs/ssh-auth.log`
-- **Log Level**: DEBUG for SSH operations, INFO for general
-- **Audit Logs**: Stored in local SQLite database file
-- **Health Check**: http://localhost:8080/health
-- **Metrics**: http://localhost:8080/metrics
-
-## Troubleshooting
-
-### Connection Issues
-- Verify SSH credentials and key pair
-- Check host availability and firewall rules
-- Review application logs for detailed errors
-
-### Database Connection Errors
-- Ensure the SQLite database file is writable (check `data/ssh_auth.db`)
-- Verify `spring.datasource.url` in application.properties points to a valid path
-
-### Key Validation Errors
-- Verify key format (RSA or ED25519)
-- Ensure private key has proper headers
-- Check for invalid characters or formatting
-
-## Performance Optimization
-
-1. **Connection Pooling**: Configured in Spring Data JPA
-2. **Async Logging**: Non-blocking log writes
-3. **Caching**: Implement for frequently accessed keys
-4. **Load Balancing**: Use multiple instances behind a load balancer
-
-## Contributing
-
-1. Create a feature branch
-2. Make your changes
-3. Add tests for new functionality
-4. Submit a pull request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For issues, questions, or contributions, please open an issue on the repository.
-
-## Version History
-
-- **v1.0.0** (2026-02-25) - Initial release with SSH connections, command execution, and key management
+**Interactive Documentation**: Visit [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) for detailed payload schemas and one-click testing.
 
 ---
 
-**Last Updated**: February 25, 2026
-**Maintained by**: Development Team
+## 💻 Monitoring & Maintenance
 
+The application exposes standard Spring Boot Actuator endpoints for health monitoring:
+
+-   **Health**: `http://localhost:8080/actuator/health`
+-   **Metrics**: `http://localhost:8080/actuator/metrics`
+-   **Logs**: Audit and application logs are stored in the `/logs` directory with daily rotation policies.
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please read our [Contributing Guidelines](CONTRIBUTING.md) before submitting pull requests.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
