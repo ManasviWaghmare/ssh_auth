@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  # SQLite is file-based; no database container required
+
+  # SSH Authentication Module API
+  ssh-auth-api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: ssh_auth_api
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:sqlite:/data/ssh_auth.db
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    ports:
+      - "8080:8080"
+    networks:
+      - ssh-auth-network
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+
+volumes:
+  data:
+    driver: local
+
+networks:
+  ssh-auth-network:
+    driver: bridge

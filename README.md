@@ -38,7 +38,7 @@ The **SSH Authentication Module** is a comprehensive Spring Boot-based REST API 
 - Dashboard monitoring integration
 
 ✅ **Database Support**
-- MySQL integration via Spring Data JPA
+- SQLite integration via Spring Data JPA (file-based)
 - Audit log storage
 - SSH key pair persistence
 
@@ -50,7 +50,7 @@ The **SSH Authentication Module** is a comprehensive Spring Boot-based REST API 
 | Spring Boot | 3.2.0 | Framework |
 | Spring Security | 5.x | Authentication/Authorization |
 | Spring Data JPA | - | Database ORM |
-| MySQL | 8.0 | Database |
+| SQLite | 3.x (file) | Database |
 | JSch | 0.1.55 | SSH Library |
 | Lombok | - | Boilerplate Reduction |
 | JWT | 0.12.3 | Token Authentication |
@@ -121,7 +121,7 @@ ssh-authentication-module/
 ### Prerequisites
 - Java 17 or higher
 - Maven 3.6+
-- MySQL 8.0+
+- SQLite 3.x (bundled with JDBC)
 - Docker & Docker Compose (optional)
 
 ### Local Development Setup
@@ -132,13 +132,13 @@ git clone <repository-url>
 cd ssh-authentication-module
 ```
 
-2. **Create MySQL Database**
+2. **Prepare SQLite Database**
+
+No external database server is required. The application will create a local SQLite file automatically. To pre-create the directory run:
 ```bash
-mysql -u root -p
-CREATE DATABASE ssh_auth_db;
-CREATE USER 'ssh_user'@'localhost' IDENTIFIED BY 'ssh_password';
-GRANT ALL PRIVILEGES ON ssh_auth_db.* TO 'ssh_user'@'localhost';
-FLUSH PRIVILEGES;
+mkdir -p data
+# (optional) initialize using sqlite3 CLI:
+# sqlite3 data/ssh_auth.db "PRAGMA journal_mode=WAL;"
 ```
 
 3. **Build the project**
@@ -230,9 +230,9 @@ Key configurations:
 ```yaml
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/ssh_auth_db
-    username: ssh_user
-    password: ssh_password
+    url: jdbc:sqlite:./data/ssh_auth.db
+    driver-class-name: org.sqlite.JDBC
+    # SQLite does not require username/password
   jpa:
     hibernate:
       ddl-auto: update
@@ -259,7 +259,7 @@ Logging configuration:
 
 - **Log Location**: `logs/ssh-auth.log`
 - **Log Level**: DEBUG for SSH operations, INFO for general
-- **Audit Logs**: Stored in MySQL database
+- **Audit Logs**: Stored in local SQLite database file
 - **Health Check**: http://localhost:8080/health
 - **Metrics**: http://localhost:8080/metrics
 
@@ -271,9 +271,8 @@ Logging configuration:
 - Review application logs for detailed errors
 
 ### Database Connection Errors
-- Ensure MySQL is running
-- Verify database credentials in application.yml
-- Check MySQL port accessibility
+- Ensure the SQLite database file is writable (check `data/ssh_auth.db`)
+- Verify `spring.datasource.url` in application.yml points to a valid path
 
 ### Key Validation Errors
 - Verify key format (RSA or ED25519)
