@@ -1,0 +1,22 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+section {
+    margin-bottom: 30px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+label {
+    display: block;
+    margin: 5px 0;
+}
+button {
+    margin-top: 10px;
+}
+pre {
+    background: #f4f4f4;
+    padding: 10px;
+    max-height: 200px;
+    overflow: auto;
+}

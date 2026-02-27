@@ -226,6 +226,21 @@ curl -X POST http://localhost:8080/api/v1/keys/upload \
 ## Configuration
 
 ### application.properties
+
+## Frontend
+
+A minimal static UI is provided under `frontend/`. It communicates with the backend API on `http://localhost:8080`.
+
+### Running the frontend
+
+1. Build & start the backend as described earlier (`mvn spring-boot:run`).
+2. Serve the `frontend` directory with a simple HTTP server, for example:
+   ```bash
+   cd frontend
+   python3 -m http.server 3000
+   ```
+3. Open http://localhost:3000 in your browser. The page contains forms for testing SSH connection, executing commands and uploading keys.
+
 Key configurations:
 ```yaml
 spring:
