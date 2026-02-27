@@ -100,7 +100,7 @@ ssh-authentication-module/
 │           └── KeyValidationException.java
 │
 ├── resources/
-│   ├── application.yml                  # Spring Configuration
+│   ├── application.properties           # Spring Configuration
 │   ├── logback.xml                      # Logging Configuration
 │   └── keys/                            # SSH Keys Storage
 │
@@ -225,7 +225,7 @@ curl -X POST http://localhost:8080/api/v1/keys/upload \
 
 ## Configuration
 
-### application.yml
+### application.properties
 Key configurations:
 ```yaml
 spring:
@@ -272,7 +272,7 @@ Logging configuration:
 
 ### Database Connection Errors
 - Ensure the SQLite database file is writable (check `data/ssh_auth.db`)
-- Verify `spring.datasource.url` in application.yml points to a valid path
+- Verify `spring.datasource.url` in application.properties points to a valid path
 
 ### Key Validation Errors
 - Verify key format (RSA or ED25519)
