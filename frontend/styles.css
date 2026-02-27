@@ -1,0 +1,9 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+/* login card centering will be handled inline by Bootstrap utilities */
+
+.navbar-text {
+    color: #fff;
+}
